@@ -4,9 +4,22 @@ const cors = require('cors')
 require('dotenv').config()
 const mongoose = require('mongoose');
 
-mongoose.connect(process.env.MONGO_URI).then(() => {
-    console.log("Connected to DB Successfully");
-})
+const PORT = process.env.PORT || 3000
+
+
+// mongoose.connect(process.env.MONGO_URI).then(() => {
+//     console.log("Connected to DB Successfully");
+// })
+const connectDB = async () => {
+    try {
+        const conn = await mongoose.connect(process.env.MONGO_URI);
+        console.log(`MongoDB Connected: ${conn.connection.host}`);
+    } catch (error) {
+        console.log(error);
+        process.exit(1);
+    }
+}
+
 
 const userSchema = mongoose.Schema({
     username: {
@@ -140,10 +153,18 @@ app.post("/api/users/:_id/exercises", async (req, res) => {
     });
 })
 
+app.all('*', (req, res) => {
+    res.json({ "every thing": "is awesome" })
+})
 
 
 
 
-const listener = app.listen(process.env.PORT || 3000, () => {
-    console.log('Your app is listening on port ' + listener.address().port)
+// const listener = app.listen(PORT, () => {
+//     console.log('Your app is listening on port ' + listener.address().port)
+// })
+connectDB().then(() => {
+    app.listen(PORT, () => {
+        console.log("listening for requests");
+    })
 })
